@@ -1,6 +1,6 @@
 package com.mycompany.biblioteca.domain.model;
 
-//Example 2
+//Example 3
 public enum EstadoPrestamo {
     ACTIVO,
     DEVUELTO,
