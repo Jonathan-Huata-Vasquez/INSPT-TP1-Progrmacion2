@@ -1,2 +1,17 @@
-C:\Users\Jet\Downloads\Descargas de programacion\UTN INSPT\Programacion 2\TP\Biblioteca\src\main\java\com\mycompany\biblioteca\JAXRSConfiguration.java
-C:\Users\Jet\Downloads\Descargas de programacion\UTN INSPT\Programacion 2\TP\Biblioteca\src\main\java\com\mycompany\biblioteca\resources\JavaEE8Resource.java
+C:\Users\JonathanHuata\Downloads\biblioteca (1)\biblioteca\src\main\java\biblioteca\biblioteca\BibliotecaApplication.java
+C:\Users\JonathanHuata\Downloads\biblioteca (1)\biblioteca\src\main\java\biblioteca\biblioteca\domain\exception\DatoInvalidoException.java
+C:\Users\JonathanHuata\Downloads\biblioteca (1)\biblioteca\src\main\java\biblioteca\biblioteca\domain\exception\ReglaDeNegocioException.java
+C:\Users\JonathanHuata\Downloads\biblioteca (1)\biblioteca\src\main\java\biblioteca\biblioteca\domain\model\EstadoLector.java
+C:\Users\JonathanHuata\Downloads\biblioteca (1)\biblioteca\src\main\java\biblioteca\biblioteca\domain\model\EstadoPrestamo.java
+C:\Users\JonathanHuata\Downloads\biblioteca (1)\biblioteca\src\main\java\biblioteca\biblioteca\domain\model\Lector.java
+C:\Users\JonathanHuata\Downloads\biblioteca (1)\biblioteca\src\main\java\biblioteca\biblioteca\domain\model\Prestamo.java
+C:\Users\JonathanHuata\Downloads\biblioteca (1)\biblioteca\src\main\java\biblioteca\biblioteca\domain\port\ILectorRepository.java
+C:\Users\JonathanHuata\Downloads\biblioteca (1)\biblioteca\src\main\java\biblioteca\biblioteca\domain\port\IPrestamoRepository.java
+C:\Users\JonathanHuata\Downloads\biblioteca (1)\biblioteca\src\main\java\biblioteca\biblioteca\infrastructure\persistence\jpa\adapter\LectorJpaAdapter.java
+C:\Users\JonathanHuata\Downloads\biblioteca (1)\biblioteca\src\main\java\biblioteca\biblioteca\infrastructure\persistence\jpa\adapter\LectorMapper.java
+C:\Users\JonathanHuata\Downloads\biblioteca (1)\biblioteca\src\main\java\biblioteca\biblioteca\infrastructure\persistence\jpa\adapter\PrestamoJpaAdapter.java
+C:\Users\JonathanHuata\Downloads\biblioteca (1)\biblioteca\src\main\java\biblioteca\biblioteca\infrastructure\persistence\jpa\adapter\PrestamoMapper.java
+C:\Users\JonathanHuata\Downloads\biblioteca (1)\biblioteca\src\main\java\biblioteca\biblioteca\infrastructure\persistence\jpa\entity\LectorEntity.java
+C:\Users\JonathanHuata\Downloads\biblioteca (1)\biblioteca\src\main\java\biblioteca\biblioteca\infrastructure\persistence\jpa\entity\PrestamoEntity.java
+C:\Users\JonathanHuata\Downloads\biblioteca (1)\biblioteca\src\main\java\biblioteca\biblioteca\infrastructure\persistence\jpa\spring\ILectorJpaRepository.java
+C:\Users\JonathanHuata\Downloads\biblioteca (1)\biblioteca\src\main\java\biblioteca\biblioteca\infrastructure\persistence\jpa\spring\IPrestamoJpaRepository.java
