@@ -6,7 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 import java.util.Optional;
 
-public interface IPrestamoJpaRepository extends JpaRepository<PrestamoEntity, Integer> {
+public interface PrestamoSpringDataRepository extends JpaRepository<PrestamoEntity, Integer> {
 
     List<PrestamoEntity> findByLectorIdAndFechaDevolucionIsNull(Integer lectorId);
 

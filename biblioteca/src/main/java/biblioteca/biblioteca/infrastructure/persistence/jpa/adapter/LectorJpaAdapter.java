@@ -6,8 +6,8 @@ import biblioteca.biblioteca.domain.model.Prestamo;
 import biblioteca.biblioteca.domain.port.ILectorRepository;
 import biblioteca.biblioteca.infrastructure.persistence.jpa.entity.LectorEntity;
 import biblioteca.biblioteca.infrastructure.persistence.jpa.entity.PrestamoEntity;
-import biblioteca.biblioteca.infrastructure.persistence.jpa.spring.ILectorJpaRepository;
-import biblioteca.biblioteca.infrastructure.persistence.jpa.spring.IPrestamoJpaRepository;
+import biblioteca.biblioteca.infrastructure.persistence.jpa.spring.LectorSpringDataRepository;
+import biblioteca.biblioteca.infrastructure.persistence.jpa.spring.PrestamoSpringDataRepository;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,13 +17,13 @@ import java.util.List;
 @Component
 public class LectorJpaAdapter implements ILectorRepository {
 
-    private final ILectorJpaRepository lectorRepo;
-    private final IPrestamoJpaRepository prestamoRepo;
+    private final LectorSpringDataRepository lectorRepo;
+    private final PrestamoSpringDataRepository prestamoRepo;
     private final LectorMapper lectorMapper;
     private final PrestamoMapper prestamoMapper;
 
-    public LectorJpaAdapter(ILectorJpaRepository lectorRepo,
-                            IPrestamoJpaRepository prestamoRepo,
+    public LectorJpaAdapter(LectorSpringDataRepository lectorRepo,
+                            PrestamoSpringDataRepository prestamoRepo,
                             LectorMapper lectorMapper,
                             PrestamoMapper prestamoMapper) {
         this.lectorRepo = lectorRepo;

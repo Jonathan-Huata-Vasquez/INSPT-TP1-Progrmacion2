@@ -4,7 +4,7 @@ package biblioteca.biblioteca.infrastructure.persistence.jpa.adapter;
 import biblioteca.biblioteca.domain.model.Prestamo;
 import biblioteca.biblioteca.domain.port.IPrestamoRepository;
 import biblioteca.biblioteca.infrastructure.persistence.jpa.entity.PrestamoEntity;
-import biblioteca.biblioteca.infrastructure.persistence.jpa.spring.IPrestamoJpaRepository;
+import biblioteca.biblioteca.infrastructure.persistence.jpa.spring.PrestamoSpringDataRepository;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -13,10 +13,10 @@ import java.util.List;
 @Component
 public class PrestamoJpaAdapter implements IPrestamoRepository {
 
-    private final IPrestamoJpaRepository repo;
+    private final PrestamoSpringDataRepository repo;
     private final PrestamoMapper mapper;
 
-    public PrestamoJpaAdapter(IPrestamoJpaRepository repo, PrestamoMapper mapper) {
+    public PrestamoJpaAdapter(PrestamoSpringDataRepository repo, PrestamoMapper mapper) {
         this.repo = repo;
         this.mapper = mapper;
     }
