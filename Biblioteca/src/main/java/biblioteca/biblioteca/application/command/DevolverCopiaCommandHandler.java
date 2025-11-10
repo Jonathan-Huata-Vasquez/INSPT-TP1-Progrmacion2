@@ -1,9 +1,7 @@
 package biblioteca.biblioteca.application.command;
 
 import biblioteca.biblioteca.application.exception.EntidadNoEncontradaException;
-import biblioteca.biblioteca.application.exception.OperacionNoPermitidaException;
 import biblioteca.biblioteca.domain.exception.DatoInvalidoException;
-import biblioteca.biblioteca.domain.exception.ReglaDeNegocioException;
 import biblioteca.biblioteca.domain.model.Copia;
 import biblioteca.biblioteca.domain.model.Lector;
 import biblioteca.biblioteca.domain.model.Prestamo;
@@ -18,13 +16,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 
-/**
- * Orquesta el caso de uso "prestar copia".
- * Regla: las invariantes viven en el dominio; aquí solo coordinamos y persistimos.
- */
-@Service                        // Spring: registra como bean de aplicación
-@RequiredArgsConstructor        // Lombok: inyección por ctor de campos final
-public class PrestarCopiaCommandHandler {
+@Service
+@RequiredArgsConstructor
+public class DevolverCopiaCommandHandler {
 
     private final ILectorRepository lectorRepo;
     private final ICopiaRepository copiaRepo;
@@ -32,7 +26,7 @@ public class PrestarCopiaCommandHandler {
     private final PrestamoDtoMapper dtoMapper;
 
     @Transactional
-    public PrestamoDto handle(PrestarCopiaCommand cmd) {
+    public PrestamoDto handle(DevolverCopiaCommand cmd) {
         if (cmd == null) throw new DatoInvalidoException("El comando no puede ser null");
 
         Lector lector = lectorRepo.porId(cmd.getIdLector());
@@ -41,22 +35,23 @@ public class PrestarCopiaCommandHandler {
         Copia copia = copiaRepo.porId(cmd.getIdCopia());
         if (copia == null) throw new EntidadNoEncontradaException("Copia inexistente: " + cmd.getIdCopia());
 
-        if (!copia.esPrestable()) {
-            throw new OperacionNoPermitidaException("La copia no está disponible para préstamo");
-        }
-        Prestamo yaActivo = prestamoRepo.activoPor(cmd.getIdLector(), cmd.getIdCopia());
-        if (yaActivo != null) {
-            throw new OperacionNoPermitidaException("Ya existe un préstamo activo para esa copia y lector");
+        //Verificacion que este activo
+        Prestamo activo = prestamoRepo.activoPor(cmd.getIdLector(), cmd.getIdCopia());
+        if (activo == null) throw new EntidadNoEncontradaException("No hay préstamo activo para esa copia y lector");
+
+        LocalDate hoy = LocalDate.now();
+        lector.registrarDevolucionEn(cmd.getIdCopia(), hoy);
+
+        if (Boolean.TRUE.equals(cmd.getEnviarAReparacion())) {
+            copia.marcarEnReparacion();
+        } else {
+            copia.marcarDevuelta(true);
         }
 
-        var hoy = LocalDate.now();
-        Prestamo nuevo = lector.abrirPrestamo(cmd.getIdCopia(), hoy);
-        copia.marcarPrestada();
-
-        Prestamo guardado = prestamoRepo.guardar(nuevo);
+        Prestamo cerrado = prestamoRepo.guardar(activo);
         lectorRepo.guardar(lector);
         copiaRepo.guardar(copia);
 
-        return dtoMapper.toDto(guardado);
+        return dtoMapper.toDto(cerrado);
     }
 }
