@@ -7,24 +7,23 @@ import biblioteca.biblioteca.infrastructure.persistence.jpa.spring.LibroSpringDa
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import lombok.RequiredArgsConstructor;
+
 import java.util.List;
 
 @Component
+@RequiredArgsConstructor
 public class LibroJpaAdapter implements ILibroRepository {
 
     private final LibroSpringDataRepository repo;
     private final LibroMapper mapper;
 
-    public LibroJpaAdapter(LibroSpringDataRepository repo, LibroMapper mapper) {
-        this.repo = repo;
-        this.mapper = mapper;
-    }
-
     @Override
     @Transactional
-    public void guardar(Libro libro) {
+    public Libro guardar(Libro libro) {
         LibroEntity e = mapper.toEntity(libro);
-        repo.save(e);
+        LibroEntity saved = repo.save(e);            // INSERT si id=null; UPDATE si id!=null
+        return mapper.toDomain(saved);
     }
 
     @Override
@@ -37,5 +36,17 @@ public class LibroJpaAdapter implements ILibroRepository {
     @Transactional(readOnly = true)
     public List<Libro> buscarPorAutor(Integer idAutor) {
         return repo.findByAutorId(idAutor).stream().map(mapper::toDomain).toList();
+    }
+
+    @Override
+    @Transactional
+    public void eliminar(Integer idLibro) {
+        repo.deleteById(idLibro);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<Libro> todos() {
+        return repo.findAll().stream().map(mapper::toDomain).toList();
     }
 }
