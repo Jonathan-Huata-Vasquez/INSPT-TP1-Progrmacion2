@@ -3,16 +3,17 @@ package biblioteca.biblioteca.infrastructure.persistence.jpa.adapter;
 import biblioteca.biblioteca.domain.model.Autor;
 import biblioteca.biblioteca.domain.port.IAutorRepository;
 import biblioteca.biblioteca.infrastructure.persistence.jpa.entity.AutorEntity;
+import biblioteca.biblioteca.infrastructure.persistence.jpa.spring.AutorSpringDataRepository;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 @Component
 public class AutorJpaAdapter implements IAutorRepository {
 
-    private final AutorJpaRepository repo;
+    private final AutorSpringDataRepository repo;
     private final AutorMapper mapper;
 
-    public AutorJpaAdapter(AutorJpaRepository repo, AutorMapper mapper) {
+    public AutorJpaAdapter(AutorSpringDataRepository repo, AutorMapper mapper) {
         this.repo = repo;
         this.mapper = mapper;
     }

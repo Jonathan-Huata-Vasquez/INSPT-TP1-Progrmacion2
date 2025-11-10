@@ -23,9 +23,10 @@ public class PrestamoJpaAdapter implements IPrestamoRepository {
 
     @Override
     @Transactional
-    public void guardar(Prestamo prestamo) {
-        PrestamoEntity entity = mapper.toEntity(prestamo);
-        repo.save(entity);
+    public Prestamo guardar(Prestamo prestamo) {
+        var entity = mapper.toEntity(prestamo);
+        var saved  = repo.save(entity);
+        return mapper.toDomain(saved);
     }
 
     @Override

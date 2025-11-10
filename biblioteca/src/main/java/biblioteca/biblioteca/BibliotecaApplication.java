@@ -10,13 +10,7 @@ import java.time.LocalDate;
 public class BibliotecaApplication {
 
 	public static void main(String[] args) {
-		//SpringApplication.run(BibliotecaApplication.class, args);
-        Lector lector = new Lector(1,"Jet");
-        lector.puedePedir(null);
-
-        System.out.println("lector " + lector.toString());
-
-
+		SpringApplication.run(BibliotecaApplication.class, args);
 	}
 
 }

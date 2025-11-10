@@ -1,5 +1,6 @@
 package biblioteca.biblioteca.domain.model;
 
+import biblioteca.biblioteca.domain.exception.DatoInvalidoException;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
