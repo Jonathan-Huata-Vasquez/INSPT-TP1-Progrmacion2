@@ -26,16 +26,16 @@ public class Editorial {
 
     /* ---------- Factorías ---------- */
 
-    public static Editorial crear(Integer idEditorial, String nombre) {
-        validarId(idEditorial);
-        Editorial e = new Editorial(idEditorial, null);
+    public static Editorial nuevo(String nombre) {
+        Editorial e = new Editorial(null, null);
         e.actualizarNombre(nombre);
         return e;
     }
 
-    /** Rehidratación desde BD. */
     public static Editorial rehidratar(Integer idEditorial, String nombre) {
-        return crear(idEditorial, nombre);
+        if (idEditorial == null) throw new DatoInvalidoException("idEditorial no puede ser null al rehidratar");
+        Editorial e = nuevo(nombre);
+        return new Editorial(idEditorial, e.getNombre());
     }
 
     /* ---------- Comportamiento ---------- */

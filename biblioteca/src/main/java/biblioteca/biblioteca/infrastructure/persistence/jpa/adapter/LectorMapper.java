@@ -21,6 +21,6 @@ public class LectorMapper {
     }
 
     public LectorEntity toEntity(Lector d) {
-        return new LectorEntity(d.id(), d.nombre(), d.bloqueadoHasta());
+        return new LectorEntity(d.getIdLector(), d.getNombre(), d.getBloqueadoHasta());
     }
 }

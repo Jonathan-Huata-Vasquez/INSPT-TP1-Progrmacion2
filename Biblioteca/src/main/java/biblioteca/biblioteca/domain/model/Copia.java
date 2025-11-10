@@ -34,16 +34,15 @@ public class Copia {
 
     /* ---------- Factorías ---------- */
 
-    public static Copia crear(Integer idCopia, Integer idLibro) {
-        validarId(idCopia, "idCopia");
-        validarId(idLibro, "idLibro");
-        return new Copia(idCopia, idLibro, EstadoCopia.EnBiblioteca);
+    public static Copia nueva(Integer idLibro) {
+        if (idLibro == null) throw new DatoInvalidoException("idLibro no puede ser null");
+        return new Copia(null, idLibro, EstadoCopia.EnBiblioteca);
     }
 
     public static Copia rehidratar(Integer idCopia, Integer idLibro, EstadoCopia estado) {
-        validarId(idCopia, "idCopia");
-        validarId(idLibro, "idLibro");
-        if (estado == null) throw new DatoInvalidoException("El estado de la copia no puede ser null");
+        if (idCopia == null) throw new DatoInvalidoException("idCopia no puede ser null al rehidratar");
+        if (idLibro == null) throw new DatoInvalidoException("idLibro no puede ser null");
+        if (estado == null) throw new DatoInvalidoException("estado no puede ser null");
         return new Copia(idCopia, idLibro, estado);
     }
 

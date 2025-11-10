@@ -2,6 +2,7 @@ package biblioteca.biblioteca.domain.model;
 
 import biblioteca.biblioteca.domain.exception.DatoInvalidoException;
 import biblioteca.biblioteca.domain.exception.ReglaDeNegocioException;
+import lombok.*;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -16,19 +17,36 @@ import java.util.Objects;
  *  - no puede pedir si hoy ≤ bloqueadoHasta
  *  - no puede abrir préstamo si ya tiene un préstamo activo de la misma copia
  */
+
+
+@ToString(onlyExplicitlyIncluded = true)
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class Lector {
 
     public static final int MAX_PRESTAMOS = 5;
     public static final int DIAS_PRESTAMO = 21;           // coherente con Prestamo
     public static final int PENALIZACION_POR_DIA = 2;     // días bloqueado por cada día de atraso
 
-    private final Integer idLector;
-    private final String nombre;
-    private LocalDate bloqueadoHasta;                     // null = no bloqueado
-    private final List<Prestamo> prestamosActivos;        // solo préstamos abiertos
+
+    @EqualsAndHashCode.Include
+    @ToString.Include
+    @Getter
+    private final Integer idLector;               // puede ser null hasta persistir
+
+    @ToString.Include
+    @Getter
+    private String nombre;
+
+    @Getter
+    @ToString.Include
+    private LocalDate bloqueadoHasta;
+
+    @ToString.Include
+    private final List<Prestamo> prestamosActivos;
 
     // --- Constructores ---
-    public Lector(Integer idLector, String nombre) {
+    private Lector(Integer idLector, String nombre) {
         if (idLector == null) {
             throw new DatoInvalidoException("El id del lector no puede ser null");
         }
@@ -41,24 +59,12 @@ public class Lector {
         this.prestamosActivos = new ArrayList<>();
     }
 
-    public Integer id() { return idLector; }
-    public String nombre() { return nombre; }
-    public LocalDate bloqueadoHasta() { return bloqueadoHasta; }
-
-    
-
-    // --- Reglas de elegibilidad ---
-    public boolean puedePedir(LocalDate hoy) {
-        Objects.requireNonNull(hoy, "La fecha de 'hoy' no puede ser null");
-        boolean noBloqueado = (bloqueadoHasta == null) || hoy.isAfter(bloqueadoHasta);
-        boolean bajoLimite = prestamosActivos.size() < MAX_PRESTAMOS;
-        return noBloqueado && bajoLimite;
+    public static Lector nuevo(String nombre) {
+        String nombreVal = validarNombre(nombre);
+        return new Lector(null, nombreVal, null, new ArrayList<>());
     }
 
-
-
-
-    // --- Comandos del agregado Lector ---
+    /** Rehidratar desde BD (con id y, opcionalmente, préstamos activos). */
     /**
      * Abre un nuevo préstamo para la copia indicada (invariante: ≤5, sin bloqueo, sin duplicados de copia).
      * Efecto: añade un Prestamo abierto a la colección interna.
@@ -79,13 +85,28 @@ public class Lector {
 
         // Crear préstamo abierto coherente con la regla de 21 días
         LocalDate vencimiento = hoy.plusDays(DIAS_PRESTAMO);
-        Prestamo nuevo = Prestamo.abrir(/*idPrestamo*/ null, this.idLector, idCopia, hoy, vencimiento);
+        Prestamo nuevo = Prestamo.abrir( this.idLector, idCopia, hoy, vencimiento);
         prestamosActivos.add(nuevo);
         return nuevo;
     }
 
-    public Prestamo abrirPrestamo(Integer idCopia) {
-        return abrirPrestamo(idCopia, LocalDate.now());
+
+    // --- Reglas de elegibilidad ---
+    public boolean puedePedir(LocalDate hoy) {
+        Objects.requireNonNull(hoy, "La fecha de 'hoy' no puede ser null");
+        boolean noBloqueado = (bloqueadoHasta == null) || hoy.isAfter(bloqueadoHasta);
+        boolean bajoLimite = prestamosActivos.size() < MAX_PRESTAMOS;
+        return noBloqueado && bajoLimite;
+    }
+
+
+
+
+    // --- Comandos del agregado Lector ---
+
+
+    public void actualizarNombre(String nuevoNombre) {
+        this.nombre = validarNombre(nuevoNombre);
     }
 
     /**
@@ -101,7 +122,7 @@ public class Lector {
         }
         Prestamo p = buscarPrestamoActivoDeCopia(idCopia);
         if (p == null) {
-            throw new DatoInvalidoException("No existe préstamo activo para la copia " + idCopia);
+            throw new ReglaDeNegocioException("No existe préstamo activo para la copia " + idCopia);
         }
 
         p.cerrar(fecha); // el propio Prestamo valida que la fecha de devolución sea válida y calcula atraso
@@ -139,8 +160,8 @@ public class Lector {
                 if (!p.estaAbierto()) {
                     throw new ReglaDeNegocioException("Solo pueden rehidratarse préstamos activos (sin fechaDevolucion)");
                 }
-                if (!idLector.equals(p.idLector())) {
-                    throw new ReglaDeNegocioException("El préstamo " + p.id() + " pertenece a otro lector");
+                if (!idLector.equals(p.getIdLector())) {
+                    throw new ReglaDeNegocioException("El préstamo del lector " + p.getIdLector() + " pertenece a otro lector (esperado=" + idLector + ")");
                 }
             }
             l.prestamosActivos.addAll(activos);
@@ -150,13 +171,20 @@ public class Lector {
 
     // --- Helpers internos ---
     private boolean tienePrestamoActivoDeCopia(Integer idCopia) {
-        return prestamosActivos.stream().anyMatch(p -> Objects.equals(p.idCopia(), idCopia) && p.estaAbierto());
+        return prestamosActivos.stream().anyMatch(p -> Objects.equals(p.getIdCopia(), idCopia) && p.estaAbierto());
     }
 
     private Prestamo buscarPrestamoActivoDeCopia(Integer idCopia) {
         return prestamosActivos.stream()
-                .filter(p -> Objects.equals(p.idCopia(), idCopia) && p.estaAbierto())
+                .filter(p -> Objects.equals(p.getIdCopia(), idCopia) && p.estaAbierto())
                 .findFirst()
                 .orElse(null);
+    }
+
+    private static String validarNombre(String nombre) {
+        if (nombre == null || nombre.trim().isEmpty()) {
+            throw new DatoInvalidoException("El nombre del lector no puede ser vacío");
+        }
+        return nombre.trim();
     }
 }

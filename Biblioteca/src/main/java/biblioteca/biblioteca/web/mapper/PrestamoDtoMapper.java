@@ -9,12 +9,12 @@ public class PrestamoDtoMapper {
     public PrestamoDto toDto(Prestamo p) {
         if (p == null) return null;
         return PrestamoDto.builder()
-                .id(p.id())
-                .idLector(p.idLector())
-                .idCopia(p.idCopia())
-                .fechaInicio(p.fechaInicio())
-                .fechaVencimiento(p.fechaVencimiento())
-                .fechaDevolucion(p.fechaDevolucion())
+                .id(p.getIdPrestamo())
+                .idLector(p.getIdLector())
+                .idCopia(p.getIdCopia())
+                .fechaInicio(p.getFechaInicio())
+                .fechaVencimiento(p.getFechaVencimiento())
+                .fechaDevolucion(p.getFechaDevolucion())
                 .build();
     }
 }

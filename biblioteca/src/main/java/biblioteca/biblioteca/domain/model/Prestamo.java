@@ -3,100 +3,83 @@ package biblioteca.biblioteca.domain.model;
 
 import biblioteca.biblioteca.domain.exception.DatoInvalidoException;
 
+import lombok.*;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
-import java.util.Objects;
 
+@Getter
+@ToString(onlyExplicitlyIncluded = true)
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class Prestamo {
 
-    private final Integer idPrestamo;      // puede ser null al abrir en memoria
+    @EqualsAndHashCode.Include
+    @ToString.Include
+    private final Integer idPrestamo;        // null mientras está “nuevo” sin persistir
+
+    @ToString.Include
     private final Integer idLector;
+
+    @ToString.Include
     private final Integer idCopia;
+
     private final LocalDate fechaInicio;
     private final LocalDate fechaVencimiento;
-    private LocalDate fechaDevolucion;     // null = abierto
+    private LocalDate fechaDevolucion;       // null = abierto
 
-    private Prestamo(Integer idPrestamo, Integer idLector, Integer idCopia,
-            LocalDate inicio, LocalDate vencimiento, LocalDate devolucion) {
-        this.idPrestamo = idPrestamo;
-        this.idLector = Objects.requireNonNull(idLector, "idLector requerido");
-        this.idCopia = Objects.requireNonNull(idCopia, "idCopia requerido");
-        this.fechaInicio = Objects.requireNonNull(inicio, "fechaInicio requerida");
-        this.fechaVencimiento = Objects.requireNonNull(vencimiento, "fechaVencimiento requerida");
-        this.fechaDevolucion = devolucion; // puede ser null
+    /* ---------- Factorías ---------- */
+
+    /** Abre un préstamo nuevo (sin id). */
+    public static Prestamo abrir(Integer idLector, Integer idCopia, LocalDate inicio, LocalDate vencimiento) {
+        validarObligatorio(idLector, "idLector");
+        validarObligatorio(idCopia, "idCopia");
+        validarObligatorio(inicio, "fechaInicio");
+        validarObligatorio(vencimiento, "fechaVencimiento");
+        if (vencimiento.isBefore(inicio)) {
+            throw new DatoInvalidoException("La fecha de vencimiento no puede ser anterior a la de inicio");
+        }
+        return new Prestamo(null, idLector, idCopia, inicio, vencimiento, null);
     }
 
-    public static Prestamo abrir(Integer idPrestamo, Integer idLector, Integer idCopia,
-            LocalDate inicio, LocalDate vencimiento) {
+    /** Rehidrata un préstamo ya almacenado (con id). */
+    public static Prestamo rehidratar(Integer idPrestamo, Integer idLector, Integer idCopia,
+                                      LocalDate inicio, LocalDate vencimiento, LocalDate devolucion) {
+        validarObligatorio(idPrestamo, "idPrestamo");
         if (vencimiento.isBefore(inicio)) {
-            throw new DatoInvalidoException("Vencimiento antes del inicio");
+            throw new DatoInvalidoException("La fecha de vencimiento no puede ser anterior a la de inicio");
         }
         return new Prestamo(idPrestamo, idLector, idCopia, inicio, vencimiento, null);
+        
     }
 
-    public boolean estaAbierto() {
-        return fechaDevolucion == null;
+    /* ---------- Reglas ---------- */
+
+    public boolean estaAbierto() { return fechaDevolucion == null; }
+
+    /** Cierra el préstamo en la fecha dada. Idempotencia negativa (no permite cerrar dos veces). */
+    public void cerrar(LocalDate fechaDevolucion) {
+        validarObligatorio(fechaDevolucion, "fechaDevolucion");
+        if (!estaAbierto()) throw new DatoInvalidoException("El préstamo ya está cerrado");
+        this.fechaDevolucion = fechaDevolucion;
     }
 
-    /**
-     * Días de atraso "al" momento indicado. Si el préstamo ya está cerrado,
-     * retorna el atraso definitivo (ignora fechaReferencia).
-     */
+    /** Días de atraso “al” momento indicado (si está cerrado, usa el definitivo). */
     public int diasAtrasoAl(LocalDate fechaReferencia) {
-        if (fechaReferencia == null) {
-            throw new DatoInvalidoException("fechaReferencia no puede ser null");
-        }
-        if (fechaDevolucion != null) {
-            return diasAtrasoDefinitivo();
-        }
+        validarObligatorio(fechaReferencia, "fechaReferencia");
+        if (!estaAbierto()) return diasAtrasoDefinitivo();
         long diff = ChronoUnit.DAYS.between(fechaVencimiento, fechaReferencia);
         return (int) Math.max(0, diff);
     }
 
-    /**
-     * Días de atraso definitivos del préstamo (cálculo con fechaDevolucion). Si
-     * aún está abierto, retorna 0.
-     */
+    /** Días de atraso definitivos (requiere estar cerrado). */
     public int diasAtrasoDefinitivo() {
-        if (fechaDevolucion == null) {
-            return 0;
-        }
+        if (estaAbierto()) return 0;
         long diff = ChronoUnit.DAYS.between(fechaVencimiento, fechaDevolucion);
         return (int) Math.max(0, diff);
     }
 
-    public void cerrar(LocalDate fechaDevolucion) {
-        if (fechaDevolucion == null) {
-            throw new DatoInvalidoException("Fecha de devolución requerida");
-        }
-        if (this.fechaDevolucion != null) {
-            throw new DatoInvalidoException("El préstamo ya está cerrado");
-        }
-        this.fechaDevolucion = fechaDevolucion;
-    }
-
-    // Getters usados por Lector y mappers
-    public Integer id() {
-        return idPrestamo;
-    }
-
-    public Integer idLector() {
-        return idLector;
-    }
-
-    public Integer idCopia() {
-        return idCopia;
-    }
-
-    public LocalDate fechaInicio() {
-        return fechaInicio;
-    }
-
-    public LocalDate fechaVencimiento() {
-        return fechaVencimiento;
-    }
-
-    public LocalDate fechaDevolucion() {
-        return fechaDevolucion;
+    /* ---------- Helpers ---------- */
+    private static void validarObligatorio(Object v, String nombre) {
+        if (v == null) throw new DatoInvalidoException(nombre + " no puede ser null");
     }
 }

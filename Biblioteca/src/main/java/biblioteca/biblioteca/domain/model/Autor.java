@@ -33,17 +33,20 @@ public class Autor {
 
     /* ---------- Factorías ---------- */
 
-    public static Autor crear(Integer idAutor, String nombre, LocalDate fechaNacimiento, String nacionalidad) {
-        validarId(idAutor);
-        Autor a = new Autor(idAutor, null, null, null);
+    /** Nuevo (sin id) */
+    public static Autor nuevo(String nombre, LocalDate fechaNacimiento, String nacionalidad) {
+        Autor a = new Autor(null, null, null, null);
         a.actualizarDatos(nombre, fechaNacimiento, nacionalidad);
         return a;
     }
 
     /** Rehidratación desde BD (aplica mismas validaciones de consistencia). */
     public static Autor rehidratar(Integer idAutor, String nombre, LocalDate fechaNacimiento, String nacionalidad) {
-        return crear(idAutor, nombre, fechaNacimiento, nacionalidad);
+        if (idAutor == null) throw new DatoInvalidoException("idAutor no puede ser null al rehidratar");
+        Autor a = nuevo(nombre, fechaNacimiento, nacionalidad);
+        return new Autor(idAutor, a.getNombre(), a.getFechaNacimiento(), a.getNacionalidad());
     }
+
 
     /* ---------- Comportamiento ---------- */
 

@@ -36,17 +36,16 @@ public class Libro {
 
     private Categoria categoria;
 
-    public static Libro crear(Integer idLibro, String titulo, Integer anioPublicacion,
-                              Integer idAutor, Integer idEditorial, Categoria categoria) {
-        validarId(idLibro);
-        Libro l = new Libro(idLibro, null, null, null, null, null);
+    public static Libro nuevo(String titulo, Integer anioPublicacion, Integer idAutor, Integer idEditorial, Categoria categoria) {
+        Libro l = new Libro(null, null, null, null, null, null);
         l.actualizarMetadatos(titulo, anioPublicacion, idAutor, idEditorial, categoria);
         return l;
     }
 
-    public static Libro rehidratar(Integer idLibro, String titulo, Integer anioPublicacion,
-                                   Integer idAutor, Integer idEditorial, Categoria categoria) {
-        return crear(idLibro, titulo, anioPublicacion, idAutor, idEditorial, categoria);
+    public static Libro rehidratar(Integer idLibro, String titulo, Integer anioPublicacion, Integer idAutor, Integer idEditorial, Categoria categoria) {
+        if (idLibro == null) throw new DatoInvalidoException("idLibro no puede ser null al rehidratar");
+        Libro l = nuevo(titulo, anioPublicacion, idAutor, idEditorial, categoria);
+        return new Libro(idLibro, l.getTitulo(), l.getAnioPublicacion(), l.getIdAutor(), l.getIdEditorial(), l.getCategoria());
     }
 
     /* ---------- Comportamiento ---------- */
