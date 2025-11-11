@@ -9,4 +9,5 @@ import java.util.List;
 
 public interface CopiaSpringDataRepository extends JpaRepository<CopiaEntity, Integer> {
     List<CopiaEntity> findByLibroIdAndEstado(Integer libroId, EstadoCopia estado);
+    List<CopiaEntity> findByLibroId(Integer libroId);
 }
