@@ -19,3 +19,9 @@ logging:
   level:
     org.springdoc: DEBUG
     org.springframework.web: DEBUG
+
+circulacion:
+  politica:
+    max-prestamos: 5
+    dias-prestamo: 21
+    penalizacion-por-dia: 2
